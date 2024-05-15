@@ -1,0 +1,993 @@
+Tags,Headers,Asked Timestamps,Modified Timestamps,View Counts,Original Posters,Questions,Answers,Linked Questions,Related Questions
+c#,GridView HyperLink field in C#,"11 years, 7 months ago","4 years, 11 months ago","
+                        Asked
+                        11 years, 7 months ago
+                    ",Sam,"
+                
+Take a look at the following code:
+
+<asp:HyperLinkField 
+    DataNavigateUrlFields=""NameID"" 
+    DataNavigateUrlFormatString=""names.aspx?nameid={0}""
+    DataTextField=""name"" 
+    HeaderText=""Name"" 
+    ItemStyle-Width=""100px""
+    ItemStyle-Wrap=""true"" />
+
+
+It takes only the name id to navigate to the next page. How will I include the two other parameters which are not in the gridview. The navigate URL I'm using has to take the keyword which is already present in the gridview and the other two parameters from the database table. I tried using all these codes. Nothing did work for me. 
+
+<asp:HyperLinkField DataTextField=""Keyword"" DataNavigateUrlFields=""Keyword""
+    DataNavigateUrlFormatString=""KeywordSrchSumDtl.aspx?Keyword={0}&State={1}&City={2}""
+    HeaderStyle-VerticalAlign=""Bottom"" ItemStyle-HorizontalAlign=""center"" />
+
+
+I cant use the above the code because the state and city are not in the GridView but available in my data table.
+
+I tried using the following code too, but it doesn't work:
+
+ <asp:TemplateField HeaderText=""Keyword""  ItemStyle-HorizontalAlign=""Center"" FooterStyle-HorizontalAlign=""Center"">
+    <ItemTemplate>
+        <asp:HyperLink ID=""link"" runat=""server"" NavigateUrl='<% # ""KeywordSrchSumDtl.aspx?Keyword=""Eval(""Keyword"")+""&State=""+Request.QueryString[""State""]%>' Text='<%# Eval(""Keyword"") %>'>
+        </asp:HyperLink>
+    </ItemTemplate>
+</asp:TemplateField>
+
+
+I also tried this:
+
+        <asp:HyperLink ID=""Link1"" runat=""Server"" NavigateUrl='<%#redirectURL()+Server.UrlEncode((Eval(""Keyword"")).ToString())%>' Text='<%# DataBinder.Eval(Container.DataItem,""Keyword"") %>'>
+        </asp:HyperLink>
+    </ItemTemplate>
+</asp:TemplateField>
+
+
+.aspx.cs
+
+return ""KeywordSrchSumDtl.aspx?Keyword="" + 
+    //I DONNO HOW TO CALL THE KEYWORD HERE//
+    + ""&State="" + System.Web.HttpContext.Current.Request.QueryString[""State""]
+    + ""&City="" + System.Web.HttpContext.Current.Request.QueryString[""City""];
+
+
+I don't know how to solve this.
+    ","
+Use the DataNavigateUrlFields property, comma-delimited value with the fields for parameters in ""KeywordSrchSumDtl.aspx?Keyword={0}&State={1}&City={2}""
+
+<asp:HyperLinkField DataNavigateUrlFields=""Keyword,State,City""
+                    DataNavigateUrlFormatString=""KeywordSrchSumDtl.aspx?Keyword={0}&State={1}&City={2}"" 
+                    Text=""View Details"" />
+
+
+A couple of examples:
+
+Passing two arguments in DataNavigateUrlFormatString in hyperlink field of .NET 2.0 Grid-View
+
+Pass Multiple Values from a GridView to Another Page  using ASP.NET
+
+EDIT:
+
+Set NavigateUrl of HyperLink in RowDataBound event of GridView
+
+<asp:GridView ID=""GridView1"" runat=""server"" 
+              AutoGenerateColumns=""False"" 
+              DataKeyNames=""Keyword""
+              DataSourceID=""SqlDataSource1"" 
+              onrowdatabound=""GridView1_RowDataBound"">
+   <asp:TemplateField HeaderText=""Keyword""  ItemStyle-HorizontalAlign=""Center""          FooterStyle-HorizontalAlign=""Center"">
+      <ItemTemplate>
+          <asp:HyperLink ID=""link"" runat=""server"" Text='<%# Eval(""Keyword"") %>' />
+      </ItemTemplate>
+    </asp:TemplateField>
+    .......
+</asp:GridView>
+
+
+Code behind:
+
+protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e) 
+{ 
+ if (e.Row.RowType == DataControlRowType.DataRow) 
+ { 
+    HyperLink hl = (HyperLink)e.Row.FindControl(""link""); 
+    if (hl != null) 
+    { 
+        DataRowView drv = (DataRowView)e.Row.DataItem; 
+        string keyword = drv[""Keyword""].ToString(); 
+        string state = Request.QueryString[""State""]; 
+        string city = Request.QueryString[""City""]; 
+        hl.NavigateUrl = ""~/KeywordSrchSumDtl.aspx?Keyword="" + keyword + ""&State="" + Server.UrlEncode(state) + ""&City="" + Server.UrlEncode(city); 
+    } 
+ } 
+}
+
+    ",how to make hyperlink in gridview without datafield?,To add hyperlink in grid
+gridview,UIWebView webCore crashes in iOS7.1 (example: www.latimes.com),"10 years, 5 months ago","10 years, 4 months ago","
+                        Modified
+                        4 years, 11 months ago
+                    ",Nikhil J Joshi,"
+                
+I have being seeing crashes in my iOS app, when opening LA Times (www.latimes.com). The crash happens in WebCore somewhere and I have no clue where. Profiling with both ""Zombie"" or ""leaks"" do not return anything for this ""EXE_BAD_ADDRESS"" error.
+
+I also checked with a small, bare UIWebView app and I could reproduce the effects. 
+
+Right now, I see this happening only with LA times, but I am not sure if there are other sites as well. 
+
+Can someone check on and guide me in what could be the possible error/source for this crash?
+
+EDIT: I have added a small UIWebView project demonstrating this bug at
+github
+
+EDIT 2: The app (include the demo at github) works perfectly fine on iOS 7.0, but crashes in iOS 7.1 ... seems a recent bug with iOS 7.1. I have issued a bug report to Apple and will keep updated.
+Thanks in advance,
+Nikhil
+    ","
+You can try with string.Format method
+
+NavigateUrl='<%# String.Format(""KeywordSrchSumDtl.aspx?Keyword={0}&State={1}&City={2}"", DataBinder.Eval(Container.DataItem, ""Keyword""), Request.QueryString[""State""], Request.QueryString[""City""]) %>'
+
+    ",Gridview Hyperlink Not Working,hyperlink in gridview
+hyperlink,DispatcherTimer vs a regular Timer in WPF app for a task scheduler,"14 years, 3 months ago","8 years, 11 months ago","
+                        Viewed
+                        60k times
+                    ",rem,"
+                
+Please, explain the difference between ""DispatcherTimer"" and ""a regular Timer"" that @Kent Boogaart meant for using in a multithreading WPF app as a task sheduler in this topic:
+
+Advice needed for multi-threading strategy for WPF application
+
+in the commentaries to one of the post (quote):
+
+-If all the DispatcherTimer does is kick off another thread, what is the point of using the DispatcherTimer?
+....those threads don't need to be started on the UI thread. You could just use a regular Timer and avoid interrupting the UI altogether
+
+What is ""a regular timer"" that is meant? How they (""DispatcherTimer"" and ""a regular Timer"") differ regarding their impact on UI? 
+
+(Until reading this post I thought about DispatcherTimer as a natural way of using timers in WPF. What is the cases when this is not true?)
+    ","
+Finally it Navigates by the following code,
+
+protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e) 
+{ 
+ if (e.Row.RowType == DataControlRowType.DataRow) 
+ { 
+      HyperLink hl = (HyperLink)e.Row.FindControl(""Link"");
+      if (hl != null)
+      {
+           DataRowView drv = (DataRowView)e.Row.DataItem;
+           string keyword = drv[""Keyword""].ToString().Trim();
+           string state = strState.ToString().Trim();
+           string city = strCity.ToString().Trim();                 
+           hl.NavigateUrl = ""KeywordSrchSumDtl.aspx?Keyword="" + keyword + ""&Geo="" + geo                             + ""&Site="" + site;
+       }
+       }
+      }
+
+
+Thank u guys for the help.
+    ",Creating a mailto link in codebehind for a dynamically generated gridview,HyperLink field in Gridview (Url Navigation)
+ios,Accessing anything GLEW related immediately crashes program in MinGW,"9 years, 6 months ago","9 years, 6 months ago","
+                        Asked
+                        10 years, 5 months ago
+                    ",amortaza,"
+                
+Here is the code:
+
+#define GLEW_STATIC
+#include ""GL/glew.h""
+
+int main () {
+    glewExperimental = GL_TRUE;
+    return 0;
+}
+
+
+Here is the output:
+
+Process finished with exit code -1073741515 (0xC0000135)
+
+
+When the 'glewExperimental' line is commented out, program exits with 0.
+
+Here is the CMake file (I am using CLion):
+
+cmake_minimum_required(VERSION 2.8.4)
+project(untitled)
+
+add_definitions(-DGL_GLEXT_PROTOTYPES)
+add_definitions(-DWINVER=0x0602)
+add_definitions(-D_WIN32_WINNT=0x0602)
+
+set(CMAKE_CXX_FLAGS ""${CMAKE_CXX_FLAGS} -std=c++11"")
+
+set(SOURCE_FILES main.cpp)
+add_executable(untitled ${SOURCE_FILES})
+
+target_link_libraries(untitled  glfw3  glew32 opengl32 gdi32)
+
+
+I am using MinGW toolchain on Windows 8.1.
+
+I compiled the GLEW library with the following bat file:
+
+gcc -DGLEW_NO_GLU -O2 -Wall -W -Iinclude -DGLEW_BUILD -o src/glew.o -c src/glew.c
+
+gcc -shared -Wl,-soname,libglew32.dll -Wl,--out-implib,lib/libglew32.dll.a -o lib/glew32.dll src/glew.o -L/mingw/lib -lglu32 -lopengl32 -lgdi32 -luser32 -lkernel32
+
+ar cr lib/libglew32.a src/glew.o
+
+
+I placed the resulting libglew32.a, libglew32.dll.a in MinGW/lib folder.
+
+I placed teh glew32.dll in Windows/System32 folder.
+
+I placed the GL/glew.h, glxew.h, wglew.h in the MinGW/include folder.
+
+What am I missing? 
+
+I cannot figure out why simply assigning a value to that variable throws an exception...
+    ","
+Some time we need to pass multiple parameters with hyperlink in Gridview, datagrid or any data list control then we can use following code:-</br> 
+
+**CODE:-** 
+<asp:GridView ID=""gvFin"" runat=""server"" CellPadding=""1"" AutoGenerateColumns=""false""> 
+
+<Columns>
+     <asp:TemplateField ItemStyle-Width=""4%"" HeaderStyle-Width=""4%"" SortExpression=""CDL""
+    HeaderText=""CDL#"" HeaderStyle-Font-Bold=""true"">
+                                                <ItemTemplate>
+   <asp:HyperLink ID=""lnk1"" runat=""server"" 
+   Text='<%# DataBinder.Eval(Container.DataItem,""TestValue"") %>'
+   NavigateUrl='<%# ""javascript:ShowACP(\"""" + DataBinder.Eval(Container.DataItem, ""ID"")     + ""\"",\"""" + DataBinder.Eval(Container.DataItem,""ACCOUNTPLAN"") + ""\"");"" %>'                                                  ForeColor=""Blue"" /  </ItemTemplate>
+ </asp:TemplateField>
+
+
+**JavaScript Function**
+
+function ShowACP(id, acplabel) 
+{            if (acplabel == ""No"")
+{
+                window.location = ""#"";
+            }
+            else</br> 
+                window.location = ""Default.aspx?gid="" + id;
+        }
+
+    ",Where can I learn more about WebCoreSharedBufferData?,Hyperlink columns in gridview
+objective-c,JavaScript calculation returns NaN,"7 years, 4 months ago","7 years, 4 months ago","
+                        Modified
+                        10 years, 4 months ago
+                    ",Saurav,"
+                
+I want to find total sum of passing the field values in array. If the field is for discount then perform minus else plus. For some reason I'm getting nan.
+
+Here is my script code
+
+<script>
+
+    var partial_cost = $('#bill_amount:disabled').val();
+    var fine = +$('#fine').val();
+    var discount = +$('#discount').val();
+    var other_cost = +$('#other_cost').val();
+    var total_cost = +$('#total').val();
+
+    var chargeAble = [
+    partial_cost,
+    fine,
+    discount,
+    other_cost
+    ];
+
+    $.each(chargeAble, function (chargeIndex, charge) {
+        charge.blur(function () {
+            var amount = 0;
+            for(charge in chargeAble)
+                if(chargeAble[charge].attr('id') == 'discount')
+                    amount -= (chargeAble[charge].val());
+                else
+                    amount += (chargeAble[charge].val());
+
+                total_cost.val(amount);
+            });
+    });
+
+</script>
+
+
+
+    ","
+You may initialize DataNavigateUrlFields from Code Behind with string[]:
+
+yourHyperLinkField.DataNavigateUrlFields = new string[] { ""Keyword"", ""State"", ""City"" };
+
+    ","[WebCoreSharedBufferData getBytes:range:]: range {0, 8} exceeds data length 0'",add hyperlink to a gridview
+ipad,DataGrid - key to run event handler on current item,"5 years, 1 month ago","5 years, 1 month ago","
+                        Viewed
+                        2k times
+                    ",dharmatech,"
+                
+The source to a small WPF program is shown below. It lists the directories under c:\windows in a DataGrid. The name is a link that can be clicked to open the directory in Explorer. 
+
+(This is just a proof of concept program to illustrate the question.)
+
+Here's what it looks like:
+
+
+
+Instead of only being able to click on the link to run the open action, I'd also like to set it up so that the user can press the o key when a row is highlighted in order to run the open action.
+
+What's a good way to set this up? Note that the program is primarily specified in C# as opposed to XAML so if possible, please post your solution in C#. However, if necessary, XAML answers are welcome too!
+
+MainWindow.xaml:
+
+<Window x:Class=""WpfFilesDataGrid.MainWindow""
+        xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
+        xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
+        xmlns:d=""http://schemas.microsoft.com/expression/blend/2008""
+        xmlns:mc=""http://schemas.openxmlformats.org/markup-compatibility/2006""
+        xmlns:local=""clr-namespace:WpfFilesDataGrid""
+        mc:Ignorable=""d""
+        Title=""MainWindow"" Height=""450"" Width=""800"">
+    <Grid>
+
+    </Grid>
+</Window>
+
+
+MainWindow.xaml.cs:
+
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+
+namespace WpfFilesDataGrid
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            var data_grid = new DataGrid()
+            {
+                IsReadOnly = true,
+                AutoGenerateColumns = false,
+                ItemsSource = new DirectoryInfo(@""c:\windows"").GetDirectories()
+            };
+
+            {
+                var setter = new EventSetter()
+                {
+                    Event = Hyperlink.ClickEvent,
+                    Handler = (RoutedEventHandler)((sender, e) => 
+                    {
+                        System.Diagnostics.Process.Start((data_grid.SelectedItem as DirectoryInfo).FullName);
+                    })
+                };
+
+                var style = new Style();
+
+                style.Setters.Add(setter);
+
+                var col = new DataGridHyperlinkColumn()
+                {
+                    Header = ""FullName"",
+                    Binding = new Binding(""FullName""),
+                    ElementStyle = style
+                };
+
+                data_grid.Columns.Add(col);
+            }
+
+            data_grid.Columns.Add(new DataGridTextColumn()
+            {
+                Header = ""CreationTime"",
+                Binding = new Binding(""CreationTime"")
+            });
+
+            var dock_panel = new DockPanel();
+
+            dock_panel.Children.Add(data_grid);
+
+            Content = dock_panel;
+        }
+    }
+}
+
+    ","
+I happened to bump into that same issue with one of my apps in iOS>7.0 only.
+
+It seems to be a sync issue which can be fixed by creating the webview from the main thread only. 
+
+As a fix I just wrapped my UIWebView creation in a dispatch_sync(dispatch_get_main_queue(), ^{ ... }); 
+
+And it solved the problem.
+Of course if your code is running on the main thread you shouldn't wrap it this way ;)
+    ",iOS app crashes randomly in WebCore,Hyperlink a column in gridview
+uiwebview,Mysql:Trim all fields in database,"12 years, 11 months ago","3 years, 2 months ago","
+                        Asked
+                        14 years, 3 months ago
+                    ",Momen Zalabany,"
+                
+UPDATE mytable SET mycolumn= LTRIM(RTRIM(mycolumn));
+
+
+works fine on trimming columns removing trailer spaces, but how can i adjust it to trim all columns without having to write each column name in table ?? cause i kind have a huge database.
+    ","
+DispatcherTimer is the regular timer.  It fires its Tick event on the UI thread, you can do anything you want with the UI.  System.Timers.Timer is an asynchronous timer, its Elapsed event runs on a thread pool thread.  You have to be very careful in your event handler, you are not allowed to touch any UI component or data-bound variables.  And you'll need to use the lock statement where ever you access class members that are also used on the UI thread.
+
+In the linked answer, the Timer class was more appropriate because the OP was trying to run code asynchronously on purpose.
+    ",WPF view not updating although INotifyPropertyChanged is implemented (.NET 5.0),HyperLink Column in GridView
+ios7,Code::Blocks MinGW Windows Defender Trojan:Win32/Fuery.C!cl,"3 years, 11 months ago","3 years, 11 months ago","
+                        Modified
+                        8 years, 11 months ago
+                    ",Nelio Alves,"
+                
+I'm testing a simple ""hello world"" program in Code::Blocks 20.03 and MinGW (GCC Build-20200227-1 9.2.0, installed separately), but I got no message on console when running it:
+
+
+
+At first I thought it was a compiler issue due to that ""no target"" in ""no project"" message, but then I realized the problem was Windows Defender blocking the .exe file, saying the program contains: Trojan:Win32/Fuery.C!cl
+
+In this topic this issue was related before, but it seems it is happening again. 
+
+I've manually allowed the .exe file on my Windows Defender, and sent it to virustotal, which indeed pointed the threat from 29 engines:
+
+https://www.virustotal.com/gui/file/2d21be5d87055eea18016112c1779e11a583ce5e3df47595aedf3fad4a8e12f6/detection
+
+Is it a known issue? What is the recomended action to solve this?
+    ","
+Regular Timer's Tick event is actually fired on the thread where the Timer was created, so in the tick event, in order to access anything with the UI, you will have to go through dispatcher.begininvoke as mentioned below.
+
+RegularTimer_Tick(object sender, EventArgs e)
+{
+    txtBox1.Text = ""count"" + i.ToString(); 
+    // error can not access
+    // txtBox1.Text property outside dispatcher thread...
+
+    // instead you have to write...
+    Dispatcher.BeginInvoke( (Action)delegate(){
+       txtBox1.Text = ""count "" + i.ToString();
+    });
+}
+
+
+In case of Dispatcher Timer, you can access UI elements without doing begin invoke or invoke as follow...
+
+DispatcherTimer_Tick(object sender, EventArgs e)
+{
+    txtBox1.Text = ""Count "" + i.ToString();
+    // no error here..
+}
+
+
+DispatcherTimer just provides convenience over Regular Timer to access UI objects easily.
+    ",Refresh UI with a Timer in WPF (with BackgroundWorker?),Gridview hyperlink
+.net,Map colors to labels in plotly go.Pie charts,"3 years, 9 months ago","1 year, 8 months ago","
+                        Viewed
+                        53k times
+                    ",Gingerhaze,"
+                
+I am plotting a series of 3 pie charts using make_subplots and go.Pie. I want to eventually put these in a dash app where the user can filter the data and the figure will update. How can I map specific colors to variables so that Male is always blue, Female is always pink, etc. You can do this with plotly express with color_discrete_map but plotly express doesn't support subplots afaik.
+Here is an example df that I make the gender pie chart from. The other dfs have the same format just different values.
+    Gender  ACC_ID  percent
+0   Female  57647   57.0
+1   Male    37715   37.0
+2   Other   5875    6.0
+
+And here is the code I use to make the figures
+fig = make_subplots(rows=1, cols=3, specs=[[{'type':'domain'}, {'type':'domain'},{'type':'domain'}]])
+fig.add_trace(go.Pie(labels=age[""Age_Group""], values=age[""percent""],customdata=age[""ACC_ID""], textinfo='label+percent',insidetextorientation='horizontal', textfont=dict(color='#000000'), marker_colors=px.colors.qualitative.Plotly),
+              1, 1)
+fig.add_trace(go.Pie(labels=gender[""Gender""], values=gender[""percent""], customdata=gender[""ACC_ID""],textinfo='label+percent',insidetextorientation='horizontal',textfont=dict(color='#000000'),marker_colors=px.colors.qualitative.Plotly),
+              1, 2)
+fig.add_trace(go.Pie(labels=sample[""Sample_Type""], values=sample[""percent""], customdata=sample[""ACC_ID""],textinfo='label+percent',texttemplate='%{label}<br>%{percent:.1%f}',insidetextorientation='horizontal',textfont=dict(color='#000000'),marker_colors=px.colors.qualitative.Prism),
+              1, 3)
+
+
+fig.update_traces(hole=.4, hoverinfo='label+percent', hovertemplate=""<b>%{label}</b><br>Percent: %{percent}<br>Total: %{customdata}<extra></extra>"")
+
+fig.update_layout(
+    showlegend=False,
+    uniformtext_minsize=14, 
+    uniformtext_mode='hide',
+
+    annotations=[dict(text='Age', x=0.13, y=0.5, font_size=20, showarrow=False, font=dict(color=""black"")),
+                 dict(text='Gender', x=0.5, y=0.5, font_size=20, showarrow=False,font=dict(color=""black"")),
+                 dict(text='Sample', x=0.879, y=0.5, font_size=20, showarrow=False,font=dict(color=""black""))])
+    
+
+plot(fig)
+
+    ","
+With .NET 4.5 you can also create an async delegate for your timer if you need to use the new .NET 4.5 await functionality. 
+
+        var timer = new DispatcherTimer();
+        timer.Interval = TimeSpan.FromSeconds(20);
+        timer.Tick += new EventHandler(async (object s, EventArgs a) =>
+        {
+            Message = ""Updating..."";
+            await UpdateSystemStatus(false);  
+            Message = ""Last updated "" + DateTime.Now;              
+        });
+        timer.Start();
+
+    ",Async friendly DispatcherTimer wrapper/subclass,Hyperlink in GridView with one column
+wpf,Spring RESTful client: root tag exception,"12 years, 5 months ago","10 years, 11 months ago","
+                        Asked
+                        9 years, 6 months ago
+                    ",Andrea Girardi,"
+                
+I'm trying to parse the result from a RESTFull call using RestTemplate following this sample http://thekspace.com/home/component/content/article/57-restful-clients-in-spring-3.html
+
+The XML Response is something like that:
+
+<brands>
+    <brand>
+        <nodeRef>1111111</nodeRef>
+        <name>Test</name>
+    </brand>
+</brands>
+
+
+For first, I configured my application-context.xml like that:
+
+<?xml version=""1.0"" encoding=""UTF-8""?>
+<beans xmlns=""http://www.springframework.org/schema/beans""
+       xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
+       xsi:schemaLocation=""http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd"">
+
+    <bean id=""restTemplate"" class=""org.springframework.web.client.RestTemplate"">
+        <property name=""messageConverters"">
+            <list>
+                <bean id=""messageConverter"" class=""org.springframework.http.converter.xml.MarshallingHttpMessageConverter"">
+                    <property name=""marshaller"" ref=""xstreamMarshaller"" />
+                    <property name=""unmarshaller"" ref=""xstreamMarshaller"" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id=""xstreamMarshaller"" class=""org.springframework.oxm.xstream.XStreamMarshaller"">
+        <property name=""aliases"">
+            <props>
+                <prop key=""brand"">com.kipcast.dataModel.drugs.bean.BrandViewList</prop>
+            </props>
+        </property>
+    </bean>
+
+
+</beans>
+
+
+The class com.kipcast.dataModel.drugs.bean.BrandViewList is a bean with an @XStreamAlias(""brand"") defined.
+
+Here how I do the rest call:
+
+ApplicationContext applicationContext = new ClassPathXmlApplicationContext(""application-context.xml"", WebscriptCaller.class); 
+RestTemplate restTemplate = applicationContext.getBean(""restTemplate"", RestTemplate.class);     
+
+String url = ""http://localhost:8081/alfresco/service/search/brand.xml?q={keyword}&alf_ticket={ticket}""; 
+List<BrandViewList> results = (List<BrandViewList>) restTemplate.getForObject(url, List.class, params);
+
+
+WebscriptCaller.class is the class from which I execute these instructions.
+
+When I try to execute that, the getForObject() fails and I get that exception:
+
+XStream unmarshalling exception; nested exception is com.thoughtworks.xstream.mapper.CannotResolveClassException: brands
+
+
+My question is, how can I fix that? Why I get this kind of Exception? How can I tell him to skip  root tag?
+
+-------------- UPDATED --------------
+fixed some issue and in particular:
+
+List<Brand> brandViewList = (List<Brand>) restTemplate.getForObject(url, Brand.class, params);
+
+
+but the result now is:
+
+org.springframework.http.converter.HttpMessageNotReadableException: Could not read [class com.kipcast.dataModel.drugs.bean.Brand]; nested exception is org.springframework.oxm.UnmarshallingFailureException: XStream unmarshalling exception; nested exception is com.thoughtworks.xstream.converters.ConversionException: nodeRef : nodeRef
+---- Debugging information ----
+message             : nodeRef
+cause-exception     : com.thoughtworks.xstream.mapper.CannotResolveClassException
+cause-message       : nodeRef
+class               : java.util.ArrayList
+required-type       : java.util.ArrayList
+converter-type      : com.thoughtworks.xstream.converters.collections.CollectionConverter
+path                : /brands/brand/nodeRef
+line number         : 3
+class[1]            : com.kipcast.dataModel.drugs.bean.Brands
+converter-type[1]   : com.thoughtworks.xstream.converters.reflection.ReflectionConverter
+version             : null
+-------------------------------
+
+    ","
+As I understood there are two questions to answer:
+
+
+  Why does my program crash when I include glewExperimental = GL_TRUE; but not when leaving it away?
+
+
+Your program crashes because it cannot load the glew library. When you leave this line away, no call to glew is made and the program will most likely not even load it.
+
+
+  Why does my program not find glew32.dll although I copied it into the system32 folder?
+
+
+If you have a 64-bit operating system, than system32 is the folder where the 64-bit dlls are placed. I know this sounds sic!, but that's how windows works. 32-bit libraries are located in SysWOW64. This SO-answer contains more details about this: why-do-64-bit-dlls-go-to-system32-and-32-bit-dlls-to-syswow64-on-64-bit-windows.
+
+In general you should never place dlls somewhere in the windows folder. This folders are reserved for system libraries/system-wide libraries like drivers etc. The reason for this is, that you get into deep troubles if someone else copies another version of e.g. glew32.dll into the system folder, which will most probably crash you app. The best way to place your own libraries is in the directory your executable lies in. 
+    ",Visual Studio 2010 hangs on trace point,GridView with Hyperlink column
+multithreading,,,,"
+                        Modified
+                        9 years, 6 months ago
+                    ",,,"
+I was able to resolve by adding the following line to CMakeLists.txt
+
+add_definitions(-DGLEW_STATIC)
+
+
+I do not understand why the above would work since, to my understanding the following would have had the same affect:
+
+#define GLEW_STATIC
+
+    ",Advice needed for multi-threading strategy for WPF application,UIWebview crashes when I load certain webpages
+timer,,,,"
+                        Viewed
+                        1k times
+                    ",,,"
+The code is using a combination of .each() AND a for-in loop... and strangely the callback from a blur() function? It can be simplified like this:
+
+var amount = 0;
+$('#bill_amount:disabled, #fine, #discount, #other_cost')
+  .blur()
+  .each(function() {
+    var sign = this.id === 'discount' ? -1 : 1;
+    amount += parseFloat($(this).val()) * sign;
+  });
+$('#total').val(amount);
+
+
+
+
+Update:
+
+Oh, you want the total to update on blur... try this code:
+
+var $values = $('#bill_amount:disabled, #fine, #discount, #other_cost');
+$values.on('blur', function() {
+  var amount = 0;
+  $values.each(function(){
+    var sign = this.id === 'discount' ? -1 : 1;
+    amount += parseFloat($(this).val()) * sign;
+  });
+  $('#total').val(amount);
+});
+
+    ",ItemsControl - Bindable Collection - Ui update by Timer Event,What should I do about this random iPhone crash in WebCore?
+opengl,,,,"
+                        Asked
+                        7 years, 4 months ago
+                    ",,,"
+I can see stuff like this all around:
+
+var fine = +$('#fine');
+
+
+The jQuery() method returns jQuery objects, not numbers or even strings. Forcing a number cast will thus return NaN.
+
+You need to first grab the text inside and than parse numbers of out it. How to do it depends on how your HTML is structured but in general:
+
+
+In form fields you can normally use .val()
+In most other tags you can use .text()
+
+    ",System.Threading.Timer with WPF/C# problems,UIWebView iOS 5 : WebKit/JavaScriptCore crash
+mingw,,,,"
+                        Modified
+                        7 years, 4 months ago
+                    ",,,"
+Make sure that all values are interpreted as numbers by JavaScript. Otherwise it will try to calculate some odd result from a string, which might get interpreted as something else than the a decimal number (hex, octa, ...).
+    ",Methods to update GUI in WPF,UIWebview crashing on IOS 7 but not on IOS 6
+glew,,,,"
+                        Viewed
+                        470 times
+                    ",,,"
+You array holds numbers and you act like they are strings
+
+var chargeAble = [  //this holds values
+    partial_cost,
+    fine,
+    discount,
+    other_cost
+];
+
+
+and in the loop you are using it for an id???
+
+chargeAble[charge].attr('id') 
+
+    ",Why do 64-bit DLLs go to System32 and 32-bit DLLs to SysWoW64 on 64-bit Windows?,Unreproducible webcore crashes
+clion,,,,"
+                        Asked
+                        5 years, 1 month ago
+                    ",,,"
+You could for example handle the PreviewKeyDown event:
+
+data_grid.PreviewKeyDown += (s, e) =>
+{
+    if(e.Key == Key.O && data_grid.SelectedItem is DirectoryInfo di)
+        System.Diagnostics.Process.Start(di.FullName);
+};
+
+    ",Building opengl application with glew and glfw,iOS uiwebview crash in WebThread
+javascript,,,,"
+                        Modified
+                        5 years, 1 month ago
+                    ",,,"
+Some years late, but might help others:
+This code trims all fields of a the table your_table.
+Could be expanded to work on the whole database in the same way....
+SET SESSION group_concat_max_len = 1000000;
+SELECT concat('update your_table set ',
+    group_concat(concat('`',COLUMN_NAME, '` = trim(`',COLUMN_NAME,'`)')),';')
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'your_table'
+INTO @trimcmd;
+    
+PREPARE s1 from @trimcmd;
+EXECUTE s1;
+DEALLOCATE PREPARE s1;
+
+    ",Same calculation returns NaN from inside object BUT returns integer from a function doing the same calculation,How to fix WebCore crashes in UIWebView?
+jquery,,,,"
+                        Viewed
+                        75 times
+                    ",,,"
+you expand the query for each column:
+
+UPDATE mytable
+SET mycolumn = LTRIM(RTRIM(mycolumn)),
+    mycolumn2 = LTRIM(RTRIM(mycolumn2)),
+    ...;
+
+    ",PreviewKeyDown with System.Diagnostics.Process.Start(some url) opens two browsers,Crash in UIKit related to WebView
+arrays,,,,"
+                        Asked
+                        12 years, 11 months ago
+                    ",,,"
+Since the question asks for the whole database, here is the script that generates the required SQL. I skip the auto execute, execute it as you like. 
+
+-- Set your database name here
+SET @my_database:='YOUR_DB_NAME';
+
+SET SESSION group_concat_max_len = 1000000;
+
+SELECT 
+    CONCAT('UPDATE `', @my_database, '`.`', TABLE_NAME, 
+            '` SET ', GROUP_CONCAT(
+                CONCAT('`', COLUMN_NAME, '` = TRIM(`', COLUMN_NAME, '`)')
+                ORDER BY ORDINAL_POSITION ASC),
+            ';') AS `query`
+FROM
+    INFORMATION_SCHEMA.COLUMNS
+WHERE
+    TABLE_SCHEMA = @my_database
+GROUP BY TABLE_NAME
+ORDER BY TABLE_NAME ASC;
+
+
+@ZweiStein Thanks.
+    ",Remove Trailing Spaces and Update in Columns in SQL Server,UIWebView crash on ios 8
+c#,,,,"
+                        Modified
+                        3 years, 2 months ago
+                    ",,,"
+UPDATE mytable SET 
+mycolumn = LTRIM(RTRIM(mycolumn)), 
+mycolumn2 = LTRIM(RTRIM(mycolumn2)) 
+
+
+and so on, and so forth.
+    ",mysql trim column in database,iOS UIWebView crashes when trying to request url
+wpf,,,,"
+                        Viewed
+                        18k times
+                    ",,,"
+If there are not too many columns, you could just
+directly 
+UPDATE each by your_column_name, via the TRIM() function:
+
+UPDATE mytable SET 
+mycolumn1 = TRIM(mycolumn1), 
+mycolumn2 = TRIM(mycolumn2),
+mycolumn3 = TRIM(mycolumn3),
+mycolumn4 = TRIM(mycolumn4)
+
+
+Otherwise, ZweiStein's answer above for a single table,
+or Izhar Aazmi's answer for an entire database  seem the way to go.
+
+Hiram's answer to  another SO Post includes a check to only TRIM VARCHAR fields: excellent feature!
+
+Or, if using T-SQL, or others which do not support TRIM,  use the LTRIM(RTRIM(...)) trick,
+ suggested by Jim Rubenstein and Denis de Bernardy above.
+    ",Mysql: Trim all columns values when selecting,Timers in .net - which to use when?
+datagrid,,,,"
+                        Asked
+                        3 years, 11 months ago
+                    ",,,"
+I was actually looking for something similar for a legacy table that's constantly updated by an outside source when I came across this question. I realize the OP was looking for a purely SQL(MySQL) answer, but in case you use Rails, you might find this tidbit that I came up with helpful:
+
+MyModel.update_all(MyModel.columns.map(&:name).map{|x| ""#{x} = TRIM(#{x})""}.join(', '))
+
+
+You can also wrap it into a class method in your model
+
+class MyModel < ActiveRecord::Base
+  def self.trim_all
+   update_all(columns.map(&:name).map{|x| ""#{x} = TRIM(#{x})""}.join(', '))
+ end
+end
+
+
+Then call it like this
+
+MyModel.trim_all
+
+    ",Compiled C executable is detected as a virus by windows defender,Thread vs Timer in C#
+mysql,,,,"
+                        Modified
+                        3 years, 11 months ago
+                    ",,,"
+You can use PHP for it ( in order to avoid sql errors, better print queries then execute them later ) : 
+
+$dbHost = 'localhost';
+$dbUsername = 'root';
+$dbPassword = '';
+$dbName = 'database';
+$db = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+$db->set_charset(""utf8"");
+
+$queries = '';
+$query=""SELECT * from table"";
+$result = $db->query($query);
+$headers = $result->fetch_fields();
+foreach($headers as $header) {
+        $col = $header->name;
+
+       $queries .= ""UPDATE table SET `"".$col.""` = TRIM(`"".$col.""`) </br>"";
+}
+echo $queries;
+
+
+?>
+    ",A simple tic-tac-toe program in Visual Studio 2019 causes Windows Defender to report threat,Performance for Timer vs DispatcherTimer
+trim,,,,"
+                        Viewed
+                        3k times
+                    ",,,"
+If you check virus total it's listed as a different name each time. It's just a false positive. I had the same problem and after enabling it in windows defender it ran fine in Atom/VsCode
+    ",C programs getting detected as Malware,What is the most efficient between Timer and managing my own thread?
+c,,,,"
+                        Asked
+                        3 years, 9 months ago
+                    ",,,"
+Without Plotly Express, you could try the following:
+
+Stop go.Pie() from sorting your data by adding:
+sort=False
+
+
+Define the colours:
+fig.update_traces(marker=dict(colors=['blue', 'red', 'green']))
+
+
+
+It is not as clean as color_discrete_map though.
+    ",Keeping the same legend while changing the palette in go.Pie subplot,Windows Form Timer Vs Single Thread Application
+mingw,,,,"
+                        Modified
+                        1 year, 8 months ago
+                    ",,,"
+You can actually use the argument marker_colors from go.Pie() to map values (colors) to labels. You just need to create a dict correlating label:color and use it like that:
+gender_color = {'Female':'pink', 'Male':'blue', 'Other':'yellow'}
+
+fig = make_subplots(rows=1, cols=3, specs=[[{'type':'domain'}, {'type':'domain'},{'type':'domain'}]])
+fig.add_trace(go.Pie(labels=age[""Age_Group""], values=age[""percent""],customdata=age[""ACC_ID""], textinfo='label+percent',insidetextorientation='horizontal', textfont=dict(color='#000000'), marker_colors=px.colors.qualitative.Plotly),1, 1)
+fig.add_trace(go.Pie(labels=gender[""Gender""], values=gender[""percent""], customdata=gender[""ACC_ID""],textinfo='label+percent',insidetextorientation='horizontal',textfont=dict(color='#000000'),marker_colors=gender[""Gender""].map(gender_color)),1, 2)
+fig.add_trace(go.Pie(labels=sample[""Sample_Type""], values=sample[""percent""], customdata=sample[""ACC_ID""],textinfo='label+percent',texttemplate='%{label}<br>%{percent:.1%f}',insidetextorientation='horizontal',textfont=dict(color='#000000'),marker_colors=px.colors.qualitative.Prism),1, 3)
+
+fig.update_traces(hole=.4, hoverinfo='label+percent', hovertemplate=""<b>%{label}</b><br>Percent: %{percent}<br>Total: %{customdata}<extra></extra>"")
+
+fig.update_layout(
+    showlegend=False,
+    uniformtext_minsize=14, 
+    uniformtext_mode='hide',
+
+    annotations=[dict(text='Age', x=0.13, y=0.5, font_size=20, showarrow=False, font=dict(color=""black"")),
+                 dict(text='Gender', x=0.5, y=0.5, font_size=20, showarrow=False,font=dict(color=""black"")),
+                 dict(text='Sample', x=0.879, y=0.5, font_size=20, showarrow=False,font=dict(color=""black""))])
+plot(fig)
+
+    ",JAXB - can class containment be flattened when marshalling to XML?,Choosing right timer for scheduler
+codeblocks,,,,"
+                        Viewed
+                        13k times
+                    ",,,"
+It seems that color_discrete_map is what you're after.
+You can create a dictionary with the desired tags as keys and corresponding color HEX codes as values.
+palette = {""Male"": ""#0064FF"",""Female"":""#FF8FDF"", ""Other"": ""#FFC300""}
+
+Then pass it as a parameter into your pie() chart.
+Would love to answer in more details but you need to provide an MRE..
+    ",Spring Rest Template and JSON data,Performance of Dispatcher timers in wpf
+python,,,,"
+                        Asked
+                        12 years, 5 months ago
+                    ",,,"
+EDIT: updated to contain only pertaining information
+
+It's best if you have distinct classes handling ""brands"" and ""brand"" tags. I would create a Brand class, rename BrandList to Brands (to be closer to the XML parts they refer to), and let Brands hold a List<Brand>. Put the proper annotations to both classes and you should be done, e.g.:
+
+@XStreamAlias(""brands"")
+class Brands {
+  @XStreamImplicit
+  List<Brand> brand;
+}
+
+@XStreamAlias(""brand"")
+class Brand {
+  String nodeRef;
+  String name;
+}
+
+
+The above code works perfectly when marshalling objects to XML, but fails as you describe when unmarshalling from XML to objects. For that to work fine, you need to tell the marshaller which annotated classes you have:
+
+<bean name=""marshaller"" class=""org.springframework.oxm.xstream.XStreamMarshaller"">
+    <property name=""autodetectAnnotations"" value=""true""/>
+    <property name=""annotatedClasses"">
+        <array>
+            <value>com.kipcast.dataModel.drugs.bean.BrandViewList</value>
+            <value>com.kipcast.dataModel.drugs.bean.BrandView</value>
+        </array>
+    </property>
+</bean>
+
+
+I created a sample project where I verify the setup.
+    ",,DispatcherTimer and Timer
+plotly,,,,"
+                        Modified
+                        10 years, 11 months ago
+                    ",,,"
+I solved this problem by using the ArrayList type. So no need to use a fake class to handle the list. It worked for me with something like this (without any annotation used) : 
+
+<bean id=""xstreamMarshaller"" class=""org.springframework.oxm.xstream.XStreamMarshaller"">
+    <property name=""aliases"">
+        <props>
+            <prop key=""brands"">java.util.ArrayList</prop>
+            <prop key=""brand"">com.kipcast.dataModel.drugs.bean.BrandView</prop>
+        </props>
+    </property>
+</bean>
+
+    ",,Efficiency of DispatcherTimer versus Thread.Sleep
+plotly-dash,,,,"
+                        Viewed
+                        5k times
+                    ",,,,,What is the best approach to schedule events?
+java,,,,,,,,,OpenGL + GLEW + MinGW application linking issue
+xml,,,,,,,,,OpenGL/GLFW: glfwOpenWindow hanging (barebones application)
+spring,,,,,,,,,GLEW fails to initialize
+rest,,,,,,,,,OpenGL GLFW window closes as soon as it opens
+alfresco,,,,,,,,,mingw fatal error: GL/glew.h: No such file or directory
